@@ -2,10 +2,10 @@ import streamlit as st
 
 st.set_page_config(page_title="Analyse Repas Santé", layout="centered")
 st.title("Analyse de ton repas")
-st.markdown("Cette application t'aide à évaluer ton repas selon ton régime personnalisé (LUV, protéinurie, acide urique, sarcoïdose).")
+st.markdown("Cette application évalue ton repas selon ton régime personnalisé : LUV, protéinurie, acide urique, sarcoïdose.")
 
 st.header("1. Téléverse une photo (optionnel)")
-uploaded_file = st.file_uploader("Téléverse une image de ton repas", type=["jpg", "jpeg", "png"])
+st.file_uploader("Image du repas (non utilisée pour l’instant)", type=["jpg", "jpeg", "png"])
 
 st.header("2. Sélectionne les aliments présents dans ton repas")
 aliments = [
@@ -14,60 +14,61 @@ aliments = [
     "Épinards", "Fenouil", "Carottes", "Betteraves", "Tomates", "Concombres", "Cerises", "Myrtilles",
     "Poire", "Pomme", "Dattes", "Fromage blanc", "Yaourt nature", "Gyoza végétarien", "Aubergines"
 ]
-aliments_selectionnes = st.multiselect("Quels aliments sont présents ?", aliments)
+selection = st.multiselect("Quels aliments sont présents ?", aliments)
 
 st.header("3. Résultat de l'analyse")
 
-def analyse_repas(aliments_selectionnes):
+def analyse(selection):
     score = 0
     remarques = []
 
     proteines_veg = {"Tofu", "Pois chiches", "Lentilles"}
-    if any(a in proteines_veg for a in aliments_selectionnes):
+    if any(a in proteines_veg for a in selection):
         score += 1
-        remarques.append("Bon apport en protéines végétales.")
+        remarques.append("✔ Bon apport en protéines végétales.")
 
-    proteines_animales = {"Œuf", "Saumon", "Poulet"}
-    if any(a in proteines_animales for a in aliments_selectionnes):
+    proteines_anim = {"Œuf", "Saumon", "Poulet"}
+    if any(a in proteines_anim for a in selection):
         score += 0.5
-        remarques.append("Protéines animales présentes (à modérer en cas de protéinurie).")
+        remarques.append("ℹ️ Protéines animales présentes (à modérer si protéinurie).")
 
     purines = {"Lentilles", "Pois chiches", "Saumon", "Dattes"}
-    if any(a in purines for a in aliments_selectionnes):
+    if any(a in purines for a in selection):
         score -= 0.5
-        remarques.append("Présence d'aliments modérément riches en purines.")
+        remarques.append("⚠️ Présence d’aliments modérément riches en purines.")
 
     bons_lipides = {"Avocat", "Amandes", "Graines de courge"}
-    if any(a in bons_lipides for a in aliments_selectionnes):
+    if any(a in bons_lipides for a in selection):
         score += 1
-        remarques.append("Présence de bons lipides anti-inflammatoires.")
+        remarques.append("✔ Présence de bons lipides anti-inflammatoires.")
 
-    alcalinisants = {"Épinards", "Fenouil", "Concombres", "Betteraves", "Courgettes", "Salade verte"}
-    if any(a in alcalinisants for a in aliments_selectionnes):
+    alcalins = {"Épinards", "Fenouil", "Concombres", "Betteraves", "Courgettes"}
+    if any(a in alcalins for a in selection):
         score += 1
-        remarques.append("Présence de légumes alcalinisants, bon pour les reins.")
+        remarques.append("✔ Aliments alcalinisants présents, bon pour les reins.")
 
-    fruits_rouges = {"Cerises", "Myrtilles", "Poire", "Pomme"}
-    if any(a in fruits_rouges for a in aliments_selectionnes):
+    antioxydants = {"Cerises", "Myrtilles", "Poire", "Pomme"}
+    if any(a in antioxydants for a in selection):
         score += 1
-        remarques.append("Fruits riches en antioxydants présents.")
+        remarques.append("✔ Fruits riches en antioxydants présents.")
 
     if score >= 3.5:
-        conclusion = "Ton repas est bien équilibré et adapté à ton régime."
+        conclusion = "✅ Repas équilibré et bien adapté à ton régime."
     elif 2 <= score < 3.5:
-        conclusion = "Repas globalement bon, mais quelques ajustements possibles."
+        conclusion = "🟡 Repas correct, mais quelques ajustements possibles."
     else:
-        conclusion = "Ce repas est à modérer en fonction de ton état de santé."
+        conclusion = "🔴 Ce repas est à modérer selon tes objectifs santé."
 
     return conclusion, remarques
 
-if aliments_selectionnes:
-    conclusion, remarques = analyse_repas(aliments_selectionnes)
-    st.subheader("Conclusion :")
+if selection:
+    conclusion, remarques = analyse(selection)
+    st.subheader("🧾 Conclusion :")
     st.success(conclusion)
 
-    st.subheader("Détails de l'analyse :")
-    for remarque in remarques:
-        st.markdown(f"- {remarque}")
+    st.subheader("🔎 Détails :")
+    for r in remarques:
+        st.markdown(f"- {r}")
 else:
-    st.info("Sélectionne des aliments pour lancer l'analyse.")
+    st.info("👉 Sélectionne les aliments pour afficher l’analyse.")
+
