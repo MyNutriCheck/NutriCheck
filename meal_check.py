@@ -1,6 +1,6 @@
 import streamlit as st
 
-st.set_page_config(page_title="Analyse Repas Santé", layout="centered")
+st.set_page_config(page_title="Meal Analysis", layout="centered")
 st.title("Analyse de ton repas")
 st.markdown("Cette application évalue ton repas selon ton régime personnalisé : LUV, protéinurie, acide urique, sarcoïdose.")
 
